@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decision Copilot</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #dbeafe;
+      color: #475569;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin: 0 0 10px 0;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #475569;
+      line-height: 1.6;
+      max-width: 760px;
+      margin: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 24px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 15px;
+      margin-bottom: 18px;
+      outline: none;
+      background: white;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      background: #0f172a;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .generate-btn {
+      width: 100%;
+    }
+
+    .example-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 2px;
+      margin-bottom: 18px;
+    }
+
+    .example-btn {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 10px 14px;
+      font-size: 13px;
+      border-radius: 999px;
+    }
+
+    .example-btn:hover {
+      background: #e2e8f0;
+      opacity: 1;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .result-text {
+      color: #334155;
+      line-height: 1.7;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+      color: #334155;
+      line-height: 1.7;
+    }
+
+    .scenario-pill {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    ul {
+      margin-top: 8px;
+      margin-bottom: 0;
+      padding-left: 20px;
+      color: #334155;
+      line-height: 1.8;
+    }
+
+    .tags {
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 14px;
+      margin: 0 8px 8px 0;
+    }
+
+    .about {
+      margin-top: 24px;
+    }
+
+    .about p {
+      color: #475569;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .loading {
+      color: #475569;
+      font-style: italic;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="badge">AI Product Demo</div>
+      <h1>Decision Copilot</h1>
+      <p class="subtitle">
+        A lightweight AI decision assistant that helps users turn vague needs into clearer choices.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Describe your need</h2>
+
+        <label for="scenario">Scenario</label>
+        <select id="scenario" onchange="updatePlaceholder()">
+          <option value="electronics">Electronics purchase</option>
+          <option value="travel">Travel planning</option>
+          <option value="restaurant">Restaurant selection</option>
+          <option value="study">Study tool selection</option>
+        </select>
+
+        <label for="request">Your request</label>
+        <textarea id="request">Budget under $500. I want a wired gaming headset that is also comfortable for daily use.</textarea>
+
+        <label>Quick examples</label>
+        <div class="example-row">
+          <button class="example-btn" type="button" onclick="applyExample('electronics')">Try electronics</button>
+          <button class="example-btn" type="button" onclick="applyExample('travel')">Try travel</button>
+          <button class="example-btn" type="button" onclick="applyExample('restaurant')">Try restaurant</button>
+          <button class="example-btn" type="button" onclick="applyExample('study')">Try study</button>
+        </div>
+
+        <button id="generateBtn" class="generate-btn" onclick="generateRecommendation()">
+          Generate Recommendation
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>AI Recommendation</h2>
+
+        <div id="scenarioLabel" class="scenario-pill">Current scenario: Electronics purchase</div>
+
+        <div class="section-title">AI summary</div>
+        <div id="summary" class="summary-box">
+          Based on your request, comfort and practical fit should be prioritized over popularity or overly aggressive gaming features.
+        </div>
+
+        <div class="section-title">Best-fit direction</div>
+        <div id="direction" class="result-text">
+          Choose a wired over-ear headset that prioritizes comfort, stable microphone quality, and low-latency performance.
+        </div>
+
+        <div class="section-title">Why</div>
+        <ul id="reasons">
+          <li>Your use case mixes gaming and daily use, so long-session comfort matters more than flashy tuning.</li>
+          <li>A wired headset is more reliable for latency-sensitive gaming.</li>
+          <li>Your request emphasizes comfort, so long-term usability should be weighted more than peak performance.</li>
+        </ul>
+
+        <div class="section-title">What to compare</div>
+        <div id="compareTags" class="tags">
+          <span class="tag">Comfort</span>
+          <span class="tag">Mic quality</span>
+          <span class="tag">Sound profile</span>
+          <span class="tag">Weight</span>
+          <span class="tag">Build quality</span>
+        </div>
+
+        <div class="section-title">Risk reminder</div>
+        <div id="risk" class="result-text">
+          Do not choose only by popularity. Long-session comfort and clamp force matter more for your scenario.
+        </div>
+      </div>
+    </div>
+
+    <div class="card about">
+      <h2>About this demo</h2>
+      <p>
+        This demo is designed for users who already have intent but still struggle to make a final decision after reading too much fragmented information. Instead of only showing more content, Decision Copilot structures the decision into summary, recommendation, comparison dimensions, and risk reminders.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const scenarioTextMap = {
+      electronics: "Electronics purchase",
+      travel: "Travel planning",
+      restaurant: "Restaurant selection",
+      study: "Study tool selection"
+    };
+
+    const placeholderMap = {
+      electronics: "Budget under $500. I want a wired gaming headset that is also comfortable for daily use.",
+      travel: "I want a 4-day trip with a moderate budget. I care more about food and city walkability than shopping.",
+      restaurant: "I want to choose a place for a casual dinner with friends. Budget is moderate and atmosphere matters more than fancy food.",
+      study: "I need a study tool for organizing notes, tracking tasks, and reducing distractions during exam preparation."
+    };
+
+    const resultMap = {
+      electronics: {
+        direction: "Choose a wired over-ear headset that prioritizes comfort, stable microphone quality, and low-latency performance.",
+        reasons: [
+          "Your use case mixes gaming and daily use, so long-session comfort matters more than flashy tuning.",
+          "A wired headset is more reliable for latency-sensitive gaming.",
+          "Build quality and microphone clarity usually matter more than premium branding in this price range."
+        ],
+        compare: ["Comfort", "Mic quality", "Sound profile", "Weight", "Build quality"],
+        risk: "Do not choose only by popularity. Long-session comfort and clamp force matter more for your scenario.",
+        summary: "Based on your request, comfort and practical fit should be prioritized over popularity or overly aggressive gaming features."
+      },
+      travel: {
+        direction: "Choose a trip plan based on budget, trip length, and whether you care more about food, landmarks, or a relaxed pace.",
+        reasons: [
+          "Travel choices become easier when the goal is narrowed to one main priority.",
+          "Short trips benefit more from compact itineraries than from trying to do everything.",
+          "Budget usually affects accommodation and transport more than sightseeing itself."
+        ],
+        compare: ["Budget", "Travel time", "Main attractions", "Food options", "Pace"],
+        risk: "Avoid overpacking the itinerary. A plan that looks efficient on paper can become tiring in real travel conditions.",
+        summary: "This request is best solved by narrowing the trip goal first, then balancing budget, pace, and overall convenience."
+      },
+      restaurant: {
+        direction: "Choose a restaurant by matching group size, atmosphere, and expected spending instead of only looking at ratings.",
+        reasons: [
+          "A highly rated place is not always the best fit for the actual occasion.",
+          "For casual dinners, environment and convenience often matter as much as food quality.",
+          "Checking menu style and average spending helps reduce mismatch before booking."
+        ],
+        compare: ["Atmosphere", "Price", "Location", "Menu fit", "Wait time"],
+        risk: "Do not rely on photos alone. The real dining experience is often shaped by noise level, seating, and service speed.",
+        summary: "For this kind of social decision, the best option is usually the one that fits the occasion, budget, and group comfort most naturally."
+      },
+      study: {
+        direction: "Choose a study tool that reduces friction in your workflow instead of adding more features you will not consistently use.",
+        reasons: [
+          "The best study tool is usually the one that you can maintain for weeks, not the one with the most functions.",
+          "Different tools fit note-taking, planning, and revision very differently.",
+          "A clear structure and low switching cost often improve learning more than advanced customization."
+        ],
+        compare: ["Ease of use", "Organization", "Cross-device access", "Focus support", "Long-term consistency"],
+        risk: "Avoid spending too much time setting up the tool itself. The tool should support studying, not become the main task.",
+        summary: "Your decision should prioritize low friction and long-term consistency, because the best study tool is the one you will keep using."
+      }
+    };
+
+    function updatePlaceholder() {
+      const scenario = document.getElementById("scenario").value;
+      document.getElementById("request").value = placeholderMap[scenario];
+    }
+
+    function applyExample(scenario) {
+      document.getElementById("scenario").value = scenario;
+      document.getElementById("request").value = placeholderMap[scenario];
+      generateRecommendation();
+    }
+
+    function generateRecommendation() {
+      const btn = document.getElementById("generateBtn");
+      const scenario = document.getElementById("scenario").value;
+      const request = document.getElementById("request").value.toLowerCase();
+
+      btn.textContent = "Generating...";
+      btn.disabled = true;
+
+      document.getElementById("summary").innerHTML = '<span class="loading">Generating recommendation...</span>';
+      document.getElementById("direction").innerHTML = '<span class="loading">Analyzing your request...</span>';
+      document.getElementById("reasons").innerHTML = '<li class="loading">Building structured reasoning...</li>';
+      document.getElementById("compareTags").innerHTML = '<span class="tag">Loading...</span>';
+      document.getElementById("risk").innerHTML = '<span class="loading">Preparing risk reminder...</span>';
+
+      setTimeout(() => {
+        const result = resultMap[scenario];
+        let reasons = [...result.reasons];
+        let risk = result.risk;
+        let summary = result.summary;
+
+        if (request.includes("budget") || request.includes("cheap") || request.includes("affordable")) {
+          reasons[2] = "Budget sensitivity is important here, so trade-offs should be made on non-core features first.";
+          summary = "Your request has a clear budget signal, so the best choice should focus on core fit and avoid paying extra for non-essential features.";
+        }
+
+        if (request.includes("comfort") || request.includes("comfortable")) {
+          reasons[2] = "Your request emphasizes comfort, so long-term usability should be weighted more than peak performance.";
+          summary = "Because comfort is a priority in your request, long-session usability should be valued more than headline specs or popularity.";
+        }
+
+        if (request.includes("friends") || request.includes("group")) {
+          risk = "Because this is a group scenario, convenience and overall fit matter more than choosing the absolute top-rated option.";
+          summary = "Since this decision affects a group, overall fit, convenience, and atmosphere matter more than optimizing for a single dimension.";
+        }
+
+        document.getElementById("scenarioLabel").textContent =
+          "Current scenario: " + scenarioTextMap[scenario];
+
+        document.getElementById("summary").textContent = summary;
+        document.getElementById("direction").textContent = result.direction;
+        document.getElementById("risk").textContent = risk;
+
+        document.getElementById("reasons").innerHTML = reasons
+          .map(item => `<li>${item}</li>`)
+          .join("");
+
+        document.getElementById("compareTags").innerHTML = result.compare
+          .map(item => `<span class="tag">${item}</span>`)
+          .join("");
+
+        btn.textContent = "Generate Recommendation";
+        btn.disabled = false;
+      }, 900);
+    }
+  </script>
+</body>
+</html>
